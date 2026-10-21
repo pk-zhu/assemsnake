@@ -1,13 +1,19 @@
-# colora — polyploid fork
+# assemsnake
 
-Fork of [colora](https://github.com/LiaOb21/colora) (MIT), specialised for **allopolyploid collapsed (primary) assembly** workflows. The polyploid-specific modifications on top of upstream colora:
+**[colora](https://github.com/LiaOb21/colora) 的 fork，针对异源多倍体坍缩（primary）组装流程特化。**
+上游 colora 面向二倍体/单套组装；本 fork 服务于多倍体坍缩组装主链（hifiasm 分相 → 坍缩 primary → purge → Hi-C 挂载 → AutoHiC 纠错），并保留上游 Arima Hi-C 比对链与 diploid 分相双链模式。
 
-- **Collapsed-primary chain**: hifiasm `--n-hap` phased assembly; downstream uses the collapsed primary (`asm.bp.p_ctg` -> `asm.primary.fa`). New config key `downstream_mode` (`primary` | `diploid`) decouples downstream scaffolding from hifiasm phasing.
-- **Single purge_dups** on the collapsed primary is allowed in phased mode (upstream forbids purge with phased assembly); alternate-assembly purge (`purge_dups2`) retained for the diploid chain.
-- **AutoHiC post-scaffolding correction** (new, `include_autohic`): matlock -> 3D-DNA visualizer -> AutoHiC error correction (`workflow/rules/autohic.smk`); Juicebox manual review stays outside the workflow.
-- Upstream Arima Hi-C mapping chain (bwa -> bwa_mem -> filter_five_end -> two_read_bam_combiner -> picard -> yahs) kept unchanged; HapHiC scaffolding not used.
+## 相对上游的改动
+
+1. **坍缩 primary 贯通全链**：hifiasm `--n-hap` 分相组装，下游使用坍缩 primary（`asm.bp.p_ctg` → `asm.primary.fa`）；新增 config 键 `downstream_mode`（`primary` | `diploid`），把挂载链模式与 hifiasm 分相参数解耦。
+2. **phased 模式允许单次 purge_dups**（上游禁止 phased + purge 组合）；alternate 组装的 `purge_dups2` 保留给 diploid 链。
+3. **新增 AutoHiC 后挂载纠错**（`include_autohic`，`workflow/rules/autohic.smk`）：matlock → 3D-DNA visualizer → AutoHiC 神经网络纠错（translocation/inversion/debris）；Juicebox 手动 review 为流程外交互步骤。
+4. **上游 Arima Hi-C 比对链保持不变**（bwa → bwa_mem → filter_five_end → two_read_bam_combiner → picard → yahs）；移除 HapHiC 挂载规则（多倍体坍缩组装上 MCL 聚类不可用）。
+
+环境要求、各步骤参数说明见下方上游 README。
 
 ---
+
 
 # Snakemake workflow: `colora`
 
