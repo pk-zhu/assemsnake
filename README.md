@@ -1,4 +1,4 @@
-# assemsnake
+# colora — polyploid fork
 
 Fork of [colora](https://github.com/LiaOb21/colora) (MIT), specialised for **allopolyploid collapsed (primary) assembly** workflows. The polyploid-specific modifications on top of upstream colora:
 
