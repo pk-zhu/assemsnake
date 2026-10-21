@@ -7,18 +7,14 @@ wildcard_constraints:
     hap = "primary|hap1|hap2",
 
 def get_all_inputs(wc=None):
-    if diploid_mode: 
-        hap = ["hap1", "hap2"]
-    else:
-        hap = ["primary"]      
+    hap = downstream_haps
     if not sample:
         # Show the user a meaningful error message
         logger.error(f"No files matching {samples_in_pattern} were found in"
                      f" {config.get('hic_path')}. Please check your config file.")
         logger.error(f"Exiting.")
         sys.exit(1)
-    if diploid_mode and config["include_purge_dups"] == True:
-        raise ValueError("You want to obtain a phased assembly because you set `phased_assembly = True` in the config file. In this case you must skip purge_dups, so please set `include_purge_dups: False` in your config.yaml.")
+    # 单次 purge_dups 作用于 primary, 与 phased 模式兼容 (本项目异源四倍体坍缩一次即可)
 
     inputs = [
         "results/nanoplot/NanoPlot-report.html",  # nanoplot report
@@ -30,11 +26,17 @@ def get_all_inputs(wc=None):
 
     inputs.extend(expand(
             "results/yahs_{hap}/asm_yahs_scaffolds_final.fa", hap=hap
-        ))  # final scaffolded assembly
+        ))  # final scaffolded assembly (yahs)
 
-    # If not in diploid mode, add asm.alternate.fa as an input
-    if not diploid_mode and config["include_purge_dups"] == True:
+    # diploid 下游链 + 单次 purge: 补 alternate purged (purge_dups2)
+    if config.get("downstream_mode", "diploid") == "diploid" and config["include_purge_dups"] == True:
         inputs.append("results/purge_dups_alt/asm.alternate_purged.fa")
+
+    # AutoHiC (3D-DNA) scaffold 修正 (include_autohic)
+    if config.get("include_autohic", False):
+        inputs.extend(expand(
+            "results/autohic_{hap}/error_summary.json",
+            hap=hap))
 
     if pltd:
         inputs.append("results/bandage_pltd/pltd.jpg")
@@ -75,12 +77,8 @@ def get_bwa_index_inputs(wildcards):
 
 
 def get_assemblies_QC(wildcards=None):
-    if diploid_mode: 
-        haps = ["hap1", "hap2"]
-    else:
-        haps = ["primary"]
     results = {}
-    for hap in haps:
+    for hap in downstream_haps:
         results[f"asm_{hap}"] = f"results/assemblies/asm_{hap}.fa"
         results[f"yahs_{hap}"] = f"results/assemblies/yahs_{hap}.fa"
         if config["include_purge_dups"]:

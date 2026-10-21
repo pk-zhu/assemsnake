@@ -1,0 +1,10 @@
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - matlock
+  - samtools=1.21
+  - python=3.9
+  - numpy=1.24
+  - pytorch-cpu=1.13
+  - typer

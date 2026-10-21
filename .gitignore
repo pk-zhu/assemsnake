@@ -4,4 +4,8 @@ logs/**
 .snakemake
 .snakemake/**
 pipeline_building.md
-Colora-1.jpeg
+Colora-1.jpegdata/**
+.snakemake-workflow-catalog.yml
+*.pyc
+__pycache__/
+data

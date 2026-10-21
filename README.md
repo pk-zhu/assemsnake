@@ -1,3 +1,14 @@
+# assemsnake
+
+Fork of [colora](https://github.com/LiaOb21/colora) (MIT), specialised for **allopolyploid collapsed (primary) assembly** workflows. The polyploid-specific modifications on top of upstream colora:
+
+- **Collapsed-primary chain**: hifiasm `--n-hap` phased assembly; downstream uses the collapsed primary (`asm.bp.p_ctg` -> `asm.primary.fa`). New config key `downstream_mode` (`primary` | `diploid`) decouples downstream scaffolding from hifiasm phasing.
+- **Single purge_dups** on the collapsed primary is allowed in phased mode (upstream forbids purge with phased assembly); alternate-assembly purge (`purge_dups2`) retained for the diploid chain.
+- **AutoHiC post-scaffolding correction** (new, `include_autohic`): matlock -> 3D-DNA visualizer -> AutoHiC error correction (`workflow/rules/autohic.smk`); Juicebox manual review stays outside the workflow.
+- Upstream Arima Hi-C mapping chain (bwa -> bwa_mem -> filter_five_end -> two_read_bam_combiner -> picard -> yahs) kept unchanged; HapHiC scaffolding not used.
+
+---
+
 # Snakemake workflow: `colora`
 
 [![Snakemake](https://img.shields.io/badge/snakemake-≥6.3.0-brightgreen.svg)](https://snakemake.github.io)
