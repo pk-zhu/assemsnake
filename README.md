@@ -1,21 +1,21 @@
 # assemsnake
 
-**[colora](https://github.com/LiaOb21/colora) 的 fork，针对异源多倍体坍缩（primary）组装流程特化。**
-上游 colora 面向二倍体/单套组装；本 fork 服务于多倍体坍缩组装主链（hifiasm 分相 → 坍缩 primary → purge → Hi-C 挂载 → AutoHiC 纠错），并保留上游 Arima Hi-C 比对链与 diploid 分相双链模式。
+**A fork of [colora](https://github.com/LiaOb21/colora), specialized for collapsed (primary) assembly of allopolyploid genomes.**
+Upstream colora targets diploid/single-set assemblies; this fork serves the collapsed polyploid main chain (hifiasm → collapsed primary → purge → Hi-C scaffolding → AutoHiC error correction) while keeping the upstream Arima Hi-C mapping chain and the Hi-C phased dual-chain mode.
 
-## 相对上游的改动
+## Changes relative to upstream
 
-1. **坍缩 primary 链特化**：`phased_assembly: False`（上游同键）走单链——hifiasm 任何模式都产 `asm.bp.p_ctg`（bubble-popped），取它作 `asm.primary.fa` 下游贯通 purge→Hi-C 挂载；`--n-hap K` 等参数仅为坍缩调参（本 fork 异源四倍体即此用法）。允许单次 purge_dups（上游禁止 phased + purge 组合）；`purge_dups2`（alternate 版）已删。
-2. **Hi-C 分相双链保留上游原样**：`phased_assembly: True` 时 hifiasm `--h1/--h2` Hi-C 分相产 hap1/hap2 双链（与上游 colora 同构），不支持 purge。
-3. **新增 AutoHiC 后挂载纠错**（`include_autohic`，`workflow/rules/autohic.smk`）：matlock → 3D-DNA visualizer → AutoHiC 神经网络纠错（translocation/inversion/debris）；Juicebox 手动 review 为流程外交互步骤。
-4. **上游 Arima Hi-C 比对链保持不变**（bwa → bwa_mem → filter_five_end → two_read_bam_combiner → picard → yahs）；移除 HapHiC 挂载规则（多倍体坍缩组装上 MCL 聚类不可用）。
+1. **Collapsed primary chain specialization**: with `phased_assembly: False` (same key as upstream) the workflow runs a single chain — every hifiasm mode produces `asm.bp.p_ctg` (bubble-popped), which is taken as `asm.primary.fa` and carried through purge → Hi-C scaffolding; `--n-hap K` etc. are only collapse-tuning parameters (this is how this fork was used for an allotetraploid). A single purge_dups pass is allowed (upstream forbids phased + purge); `purge_dups2` (alternate version) has been removed.
+2. **Hi-C phased dual-chain kept as upstream**: with `phased_assembly: True`, hifiasm `--h1/--h2` Hi-C phasing produces hap1/hap2 dual chains (same structure as upstream colora); purge is not supported in that mode.
+3. **New AutoHiC post-scaffolding correction** (`include_autohic`, `workflow/rules/autohic.smk`): matlock → 3D-DNA visualizer → AutoHiC neural-network correction (translocation/inversion/debris); manual Juicebox review is an interactive step outside the workflow.
+4. **Upstream Arima Hi-C mapping chain unchanged** (bwa → bwa_mem → filter_five_end → two_read_bam_combiner → picard → yahs); the HapHiC scaffolding rules have been removed (MCL clustering does not work on collapsed polyploid assemblies).
 
-> **与上游的边界**：上游 `phased_assembly: False` 分支的 `--primary` 双产物模式
-> （p_ctg + a_ctg alternate 链，含 purge_dups2）在本 fork 中被坍缩 primary 单链
-> （`asm.bp.p_ctg` + 单次 purge）替代；`phased_assembly: True` 的 Hi-C 分相双链
-> 保持上游原样。
+> **Boundary with upstream**: in the upstream `phased_assembly: False` branch, the
+> `--primary` dual-output mode (p_ctg + a_ctg alternate chain, with purge_dups2)
+> has been replaced by a collapsed single primary chain (`asm.bp.p_ctg` + one purge
+> pass); the `phased_assembly: True` Hi-C phased dual-chain mode is kept as upstream.
 
-环境要求、各步骤参数说明见下方上游 README。
+For environment requirements and per-step parameters, see the upstream README below.
 
 ---
 
