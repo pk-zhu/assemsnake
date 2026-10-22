@@ -258,13 +258,14 @@ fcsgx:
 # purge_dups
 
 Purge_dups 是一种在大多数装配流程中用于根据读深度清除装配中光层和重叠部分的工具。
-本项目（2026-10-19 起）已改造为**单次 purge**：`hifiasm` 分相组装（`phased_assembly: True`）
-得到的坍缩 primary（`asm.bp.p_ctg` → `asm.primary.fa`）直接跑一次 purge_dups，
-下游 `downstream_mode: "primary"` 走单链 yahs/autohic。原版 colora 的 alternate 组装
-purge 规则（purge_dups2，diploid 双组装链用）已删除。
+本项目（2026-10-19 起）已改造为**单次 purge**：hifiasm 的坍缩 primary（`asm.bp.p_ctg` →
+`asm.primary.fa`，任何模式都产）直接跑一次 purge_dups，下游
+`scaffold_sets: "collapsed"` 走单链 yahs/autohic。原版 colora 的 alternate 组装
+purge 规则（purge_dups2）已删除。
 
-- `include_purge_dups: True/False` 控制是否跑 purge_dups（异源四倍体坍缩链上可正常启用）
-- `phased_assembly: True` + `downstream_mode: "primary"` 为本项目当前组合
+- `include_purge_dups: True/False` 控制是否跑 purge_dups（collapsed 链上可正常启用）
+- `scaffold_sets: "collapsed"`（本项目当前）为唯一支持 purge 的模式；`"haplotype"` 双链不支持
+- hifiasm 参数（如 `--n-hap 4`）在此场景是**坍缩调参**，不是结构开关；结构开关只有 `scaffold_sets`
 
 
 # Arima genomics mapping pipeline

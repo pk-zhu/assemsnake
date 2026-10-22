@@ -5,8 +5,8 @@
 
 ## 相对上游的改动
 
-1. **坍缩 primary 贯通全链**：hifiasm `--n-hap` 分相组装，下游使用坍缩 primary（`asm.bp.p_ctg` → `asm.primary.fa`）；新增 config 键 `downstream_mode`（`primary` | `diploid`），把挂载链模式与 hifiasm 分相参数解耦。
-2. **phased 模式允许单次 purge_dups**（上游禁止 phased + purge 组合）；alternate 组装的 `purge_dups2` 保留给 diploid 链。
+1. **单结构开关 `scaffold_sets`**（`collapsed` | `haplotype`）：决定下游挂几条链，hifiasm 产物形态由它反推——collapsed 只用 `asm.bp.p_ctg`（任何 hifiasm 模式都产，`--n-hap K` 仅为坍缩调参，本fork异源四倍体即此用法）；haplotype 额外产 hap1/hap2 各挂一条链（自动补 `--n-hap`）。
+2. **collapsed 模式允许单次 purge_dups**（上游禁止 phased + purge 组合）；haplotype 双链模式不支持 purge（与上游一致）；`purge_dups2`（alternate 版）已删。
 3. **新增 AutoHiC 后挂载纠错**（`include_autohic`，`workflow/rules/autohic.smk`）：matlock → 3D-DNA visualizer → AutoHiC 神经网络纠错（translocation/inversion/debris）；Juicebox 手动 review 为流程外交互步骤。
 4. **上游 Arima Hi-C 比对链保持不变**（bwa → bwa_mem → filter_five_end → two_read_bam_combiner → picard → yahs）；移除 HapHiC 挂载规则（多倍体坍缩组装上 MCL 聚类不可用）。
 

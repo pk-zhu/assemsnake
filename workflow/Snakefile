@@ -10,11 +10,13 @@ configfile: "config/config.yaml"
 samples_in_pattern = "{sample}_1.fastq.gz"
 sample, = glob_wildcards(config["hic_path"] + samples_in_pattern).sample
 
-# set {diploid_mode} global variable - used to run hifiasm_het rather than hifiasm
-diploid_mode=config["hifiasm"]["phased_assembly"] == True
+# 下游挂载链数 (唯一结构开关): collapsed=坍缩 primary 单链; haplotype=hap1/hap2 双链
+scaffold_sets = config.get("scaffold_sets", "collapsed")
+if scaffold_sets not in ("collapsed", "haplotype"):
+    sys.exit("config scaffold_sets 只支持 'collapsed' 或 'haplotype'")
 
-# 下游组装链: primary=坍缩组装单链 (异源多倍体, 本项目); diploid=hap1/hap2 分相双链 (原版 colora)
-downstream_haps = ["hap1", "hap2"] if config.get("downstream_mode", "diploid") == "diploid" else ["primary"]
+# 下游组装链: 由 scaffold_sets 反推
+downstream_haps = ["hap1", "hap2"] if scaffold_sets == "haplotype" else ["primary"]
 
 # set {pltd} global variable - used to run oatk_pltd rather than oatk
 pltd=config["oatk"]["optional_params"]["-p"]
@@ -37,8 +39,6 @@ include: "rules/hifiasm.smk"
 include: "rules/ncbi_fcsgx.smk"  # to add if eventually I manage to integrate fcsgx
 # Include the purge_dups rule
 include: "rules/purge_dups.smk"
-# Include the purge_dups2 rule for alternate assembly
-include: "rules/purge_dups2.smk"
 # Include the fastp rule
 include: "rules/fastp.smk"
 # Include the bwa_index rule

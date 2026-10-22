@@ -51,14 +51,15 @@ fastp:
     "--cut_front": False # set to True for Arima Hi-C library prep kit generated data
     "--cut_front_window_size": "" # set to 5 for Arima Hi-C library prep kit generated data
 
-# 下游组装链模式 (与 hifiasm 分相参数解耦):
-#   primary = 坍缩组装单链 (purge/yahs/autohic 只跑一次, 异源多倍体本项目用)
-#   diploid = hap1/hap2 分相双链 (原版 colora; 注意与 include_purge_dups 组合仅支持非分相组装)
-downstream_mode: "primary"
+# 下游挂载链数 (唯一结构开关, hifiasm 产物形态由它反推):
+#   collapsed = 坍缩 primary 单链 (bp.p_ctg → asm.primary.fa); hifiasm 参数只影响坍缩质量,
+#               可用 --n-hap K 辅助去冗余 (异源多倍体本项目用法)
+#   haplotype = hap1/hap2 各挂一条链; hifiasm 自动补 --n-hap 产两套单倍型;
+#               此模式不支持 include_purge_dups (与上游 colora 一致)
+scaffold_sets: "collapsed"
 
 # Customisable parameters for hifiasm
 hifiasm:
-  phased_assembly: True # set to true if you want to obtain a phased assembly
   optional_params:
     "-f": false # used for small datasets
     "-l": "3" # purge level. 0: no purging; 1: light; 2/3: aggressive [0 for trio; 3 for unzip]

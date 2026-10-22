@@ -6,6 +6,10 @@ import os
 wildcard_constraints:
     hap = "primary|hap1|hap2",
 
+# scaffold_sets 校验: haplotype 双链不支持 purge (上游 colora 同约定)
+if config.get("scaffold_sets", "collapsed") == "haplotype" and config.get("include_purge_dups", False):
+    sys.exit("scaffold_sets: 'haplotype' 不支持 include_purge_dups: True (purge_dups 只作用于坍缩 primary)")
+
 def get_all_inputs(wc=None):
     hap = downstream_haps
     if not sample:
@@ -27,10 +31,6 @@ def get_all_inputs(wc=None):
     inputs.extend(expand(
             "results/yahs_{hap}/asm_yahs_scaffolds_final.fa", hap=hap
         ))  # final scaffolded assembly (yahs)
-
-    # diploid 下游链 + 单次 purge: 补 alternate purged (purge_dups2)
-    if config.get("downstream_mode", "diploid") == "diploid" and config["include_purge_dups"] == True:
-        inputs.append("results/purge_dups_alt/asm.alternate_purged.fa")
 
     # AutoHiC (3D-DNA) scaffold 修正 (include_autohic)
     if config.get("include_autohic", False):
