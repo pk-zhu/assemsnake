@@ -8,6 +8,7 @@ rule yahs:
         bam="results/arima_mapping_pipeline_{hap}/REP_DIR/paired_mark_dups_final.bam",
     output:
         scaffolds="results/yahs_{hap}/asm_yahs_scaffolds_final.fa",
+        agp="results/yahs_{hap}/asm_yahs_scaffolds_final.agp",
         link="results/assemblies/yahs_{hap}.fa"
     log:
         "logs/yahs_{hap}.log",

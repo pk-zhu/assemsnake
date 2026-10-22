@@ -4,9 +4,9 @@
 import os
 
 wildcard_constraints:
-    hap = "primary|hap1|hap2",
+    hap = "primary|alternate|hap1|hap2",
 
-# phased 双链不支持 purge (上游 colora 同约定); 坍缩 primary 允许单次 purge (本 fork)
+# phased 双链不支持 purge (上游 colora 同约定); 坍缩 primary / alternate 双产物均允许 purge
 if diploid_mode and config.get("include_purge_dups", False):
     sys.exit("You set `phased_assembly: True` — phased assembly must skip purge_dups, please set `include_purge_dups: False` in config.yaml.")
 
@@ -69,6 +69,8 @@ def get_purge_dups_inputs():
 def get_bwa_index_inputs(wildcards):
     hap = wildcards.hap
     if config["include_purge_dups"] == True:
+        if hap == "alternate":
+            return "results/purge_dups_alt/asm.alternate_purged.fa"
         return "results/purge_dups/asm.{hap}_purged.fa"
     elif config["include_fcsgx"] == True:
         return f"results/ncbi_fcsgx_{hap}/asm_clean.fa"

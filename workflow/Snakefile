@@ -10,10 +10,21 @@ configfile: "config/config.yaml"
 samples_in_pattern = "{sample}_1.fastq.gz"
 sample, = glob_wildcards(config["hic_path"] + samples_in_pattern).sample
 
-# 下游模式开关 (与上游 colora 一致): phased_assembly=True 走 --h1/--h2 Hi-C 分相 hap1/hap2
-# 双链; False 走坍缩 primary 单链 (bp.p_ctg, 本 fork 多倍体特化)
+# 下游模式开关:
+#   phased_assembly: True          → 上游 Hi-C 分相, --h1/--h2, hap1/hap2 双链 (禁 purge)
+#   phased_assembly: False
+#     + include_alternate: True    → 上游 --primary 双产物, p_ctg/a_ctg 各挂一条链
+#                                    (primary/alternate), purge_dups + purge_dups2;
+#                                    分型组装场景 (fork 扩展: 上游不挂 alternate 链)
+#     + include_alternate: False   → 坍缩 primary 单链 (bp.p_ctg, fork 多倍体特化)
 diploid_mode = config["hifiasm"].get("phased_assembly", False) == True
-downstream_haps = ["hap1", "hap2"] if diploid_mode else ["primary"]
+include_alternate = (not diploid_mode) and config.get("include_alternate", False) == True
+if diploid_mode:
+    downstream_haps = ["hap1", "hap2"]
+elif include_alternate:
+    downstream_haps = ["primary", "alternate"]
+else:
+    downstream_haps = ["primary"]
 
 # set {pltd} global variable - used to run oatk_pltd rather than oatk
 pltd=config["oatk"]["optional_params"]["-p"]
@@ -36,6 +47,8 @@ include: "rules/hifiasm.smk"
 include: "rules/ncbi_fcsgx.smk"  # to add if eventually I manage to integrate fcsgx
 # Include the purge_dups rule
 include: "rules/purge_dups.smk"
+# Include the purge_dups_alt rule (alternate 链清理, include_alternate 模式)
+include: "rules/purge_dups2.smk"
 # Include the fastp rule
 include: "rules/fastp.smk"
 # Include the bwa_index rule

@@ -67,6 +67,12 @@ hifiasm:
     "--hom-cov": "66" # 4n 峰 coverage（纯合峰）
     "-s": "0.2" # 降低相似度阈值，更激进 purge（默认 -l3 为 0.55）
 
+# alternate 组装 (仅 phased_assembly: False 时生效):
+#   True  = 上游 --primary 双产物, p_ctg/a_ctg 各挂一条链, purge_dups + purge_dups2
+#           各清一遍 (多倍体分型组装场景)
+#   False = 坍缩 primary 单链 (默认)
+include_alternate: False
+
 #Set this to False if you want to skip the fcsgx step:
 include_fcsgx: False #inlcude this rule only if you have previously downloaded the database (recommended to run fcsgx only on a HPC. It requires around 500 GB of space on your disk and a large RAM)
 
