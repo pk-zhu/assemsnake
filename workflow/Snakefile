@@ -10,13 +10,10 @@ configfile: "config/config.yaml"
 samples_in_pattern = "{sample}_1.fastq.gz"
 sample, = glob_wildcards(config["hic_path"] + samples_in_pattern).sample
 
-# 下游挂载链数 (唯一结构开关): collapsed=坍缩 primary 单链; haplotype=hap1/hap2 双链
-scaffold_sets = config.get("scaffold_sets", "collapsed")
-if scaffold_sets not in ("collapsed", "haplotype"):
-    sys.exit("config scaffold_sets 只支持 'collapsed' 或 'haplotype'")
-
-# 下游组装链: 由 scaffold_sets 反推
-downstream_haps = ["hap1", "hap2"] if scaffold_sets == "haplotype" else ["primary"]
+# 下游模式开关 (与上游 colora 一致): phased_assembly=True 走 --h1/--h2 Hi-C 分相 hap1/hap2
+# 双链; False 走坍缩 primary 单链 (bp.p_ctg, 本 fork 多倍体特化)
+diploid_mode = config["hifiasm"].get("phased_assembly", False) == True
+downstream_haps = ["hap1", "hap2"] if diploid_mode else ["primary"]
 
 # set {pltd} global variable - used to run oatk_pltd rather than oatk
 pltd=config["oatk"]["optional_params"]["-p"]

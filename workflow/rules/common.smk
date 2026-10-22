@@ -6,9 +6,9 @@ import os
 wildcard_constraints:
     hap = "primary|hap1|hap2",
 
-# scaffold_sets 校验: haplotype 双链不支持 purge (上游 colora 同约定)
-if config.get("scaffold_sets", "collapsed") == "haplotype" and config.get("include_purge_dups", False):
-    sys.exit("scaffold_sets: 'haplotype' 不支持 include_purge_dups: True (purge_dups 只作用于坍缩 primary)")
+# phased 双链不支持 purge (上游 colora 同约定); 坍缩 primary 允许单次 purge (本 fork)
+if diploid_mode and config.get("include_purge_dups", False):
+    sys.exit("You set `phased_assembly: True` — phased assembly must skip purge_dups, please set `include_purge_dups: False` in config.yaml.")
 
 def get_all_inputs(wc=None):
     hap = downstream_haps

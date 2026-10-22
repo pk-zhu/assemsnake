@@ -5,14 +5,15 @@
 
 ## 相对上游的改动
 
-1. **单结构开关 `scaffold_sets`**（`collapsed` | `haplotype`）：决定下游挂几条链，hifiasm 产物形态由它反推——collapsed 只用 `asm.bp.p_ctg`（任何 hifiasm 模式都产，`--n-hap K` 仅为坍缩调参，本fork异源四倍体即此用法）；haplotype 额外产 hap1/hap2 各挂一条链（自动补 `--n-hap`）。
-2. **collapsed 模式允许单次 purge_dups**（上游禁止 phased + purge 组合）；haplotype 双链模式不支持 purge（与上游一致）；`purge_dups2`（alternate 版）已删。
+1. **坍缩 primary 链特化**：`phased_assembly: False`（上游同键）走单链——hifiasm 任何模式都产 `asm.bp.p_ctg`（bubble-popped），取它作 `asm.primary.fa` 下游贯通 purge→Hi-C 挂载；`--n-hap K` 等参数仅为坍缩调参（本 fork 异源四倍体即此用法）。允许单次 purge_dups（上游禁止 phased + purge 组合）；`purge_dups2`（alternate 版）已删。
+2. **Hi-C 分相双链保留上游原样**：`phased_assembly: True` 时 hifiasm `--h1/--h2` Hi-C 分相产 hap1/hap2 双链（与上游 colora 同构），不支持 purge。
 3. **新增 AutoHiC 后挂载纠错**（`include_autohic`，`workflow/rules/autohic.smk`）：matlock → 3D-DNA visualizer → AutoHiC 神经网络纠错（translocation/inversion/debris）；Juicebox 手动 review 为流程外交互步骤。
 4. **上游 Arima Hi-C 比对链保持不变**（bwa → bwa_mem → filter_five_end → two_read_bam_combiner → picard → yahs）；移除 HapHiC 挂载规则（多倍体坍缩组装上 MCL 聚类不可用）。
 
-> **与上游的边界**：本 fork 为多倍体坍缩场景特化，不支持上游 `phased_assembly: True` 的
-> `--h1/--h2` Hi-C 分相双链模式（haplotype 模式用 `--n-hap` 纯 HiFi 分相）。需要 Hi-C
-> 分相二倍体流程请直接使用上游 colora。
+> **与上游的边界**：上游 `phased_assembly: False` 分支的 `--primary` 双产物模式
+> （p_ctg + a_ctg alternate 链，含 purge_dups2）在本 fork 中被坍缩 primary 单链
+> （`asm.bp.p_ctg` + 单次 purge）替代；`phased_assembly: True` 的 Hi-C 分相双链
+> 保持上游原样。
 
 环境要求、各步骤参数说明见下方上游 README。
 

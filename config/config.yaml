@@ -51,19 +51,19 @@ fastp:
     "--cut_front": False # set to True for Arima Hi-C library prep kit generated data
     "--cut_front_window_size": "" # set to 5 for Arima Hi-C library prep kit generated data
 
-# 下游挂载链数 (唯一结构开关, hifiasm 产物形态由它反推):
-#   collapsed = 坍缩 primary 单链 (bp.p_ctg → asm.primary.fa); hifiasm 参数只影响坍缩质量,
-#               可用 --n-hap K 辅助去冗余 (异源多倍体本项目用法)
-#   haplotype = hap1/hap2 各挂一条链; hifiasm 自动补 --n-hap 产两套单倍型;
-#               此模式不支持 include_purge_dups (与上游 colora 一致)
-scaffold_sets: "collapsed"
-
 # Customisable parameters for hifiasm
 hifiasm:
+  # 下游模式开关 (与上游 colora 同键同义):
+  #   False = 坍缩 primary 单链 (bp.p_ctg → asm.primary.fa), 本 fork 多倍体特化,
+  #           允许 include_purge_dups; optional_params 的 --n-hap K / --hom-cov / -s
+  #           均为坍缩调参, 不是结构开关
+  #   True  = 上游 Hi-C 分相模式 (--h1/--h2), 产 hap1/hap2 双链, 必须 include_purge_dups: False,
+  #           且 optional_params 应移除 --n-hap/--hom-cov/-s 等坍缩调参
+  phased_assembly: False
   optional_params:
     "-f": false # used for small datasets
     "-l": "3" # purge level. 0: no purging; 1: light; 2/3: aggressive [0 for trio; 3 for unzip]
-    "--n-hap": "4" # 倍性，纯 hifi 模式分相
+    "--n-hap": "4" # 倍性，纯 hifi 模式分相 (仅坍缩调参)
     "--hom-cov": "66" # 4n 峰 coverage（纯合峰）
     "-s": "0.2" # 降低相似度阈值，更激进 purge（默认 -l3 为 0.55）
 
