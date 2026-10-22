@@ -10,6 +10,10 @@
 3. **新增 AutoHiC 后挂载纠错**（`include_autohic`，`workflow/rules/autohic.smk`）：matlock → 3D-DNA visualizer → AutoHiC 神经网络纠错（translocation/inversion/debris）；Juicebox 手动 review 为流程外交互步骤。
 4. **上游 Arima Hi-C 比对链保持不变**（bwa → bwa_mem → filter_five_end → two_read_bam_combiner → picard → yahs）；移除 HapHiC 挂载规则（多倍体坍缩组装上 MCL 聚类不可用）。
 
+> **与上游的边界**：本 fork 为多倍体坍缩场景特化，不支持上游 `phased_assembly: True` 的
+> `--h1/--h2` Hi-C 分相双链模式（haplotype 模式用 `--n-hap` 纯 HiFi 分相）。需要 Hi-C
+> 分相二倍体流程请直接使用上游 colora。
+
 环境要求、各步骤参数说明见下方上游 README。
 
 ---
