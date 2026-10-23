@@ -8,7 +8,6 @@ A fork of [colora](https://github.com/LiaOb21/colora) specialized for collapsed 
 2. `phased_assembly: False` + `include_alternate: True` runs the upstream `--primary` dual-output mode and scaffolds both chains (primary/alternate) through Hi-C — for haplotyped polyploid assemblies.
 3. `phased_assembly: True` (Hi-C phased hap1/hap2 dual chain) kept as upstream.
 4. New AutoHiC post-scaffolding correction (`include_autohic`): matlock → 3D-DNA visualizer → AutoHiC neural-network correction; manual Juicebox review stays outside the workflow.
-5. HapHiC scaffolding rules removed; the Arima Hi-C mapping chain is unchanged.
 
 For environment requirements and per-step parameters, see the upstream README below.
 
