@@ -4,10 +4,9 @@ A fork of [colora](https://github.com/LiaOb21/colora) specialized for collapsed 
 
 ## Changes vs upstream
 
-1. `phased_assembly: False` + `include_alternate: False` (default) runs a collapsed single chain (`asm.bp.p_ctg` as `asm.primary.fa`); `--n-hap K` is collapse tuning only, a single purge_dups pass is allowed.
-2. `include_alternate: True` switches hifiasm to `--primary` dual-output mode (`p_ctg` → primary, `a_ctg` → alternate; `--n-hap K` caps the haplotypic copies kept in the alternate) and carries the alternate through purge and Hi-C scaffolding as a second chain; default `False` discards `a_ctg`.
-3. `phased_assembly: True` (Hi-C phased hap1/hap2 dual chain) kept as upstream.
-4. New AutoHiC post-scaffolding correction (`include_autohic`): matlock → 3D-DNA visualizer → AutoHiC neural-network correction; manual Juicebox review stays outside the workflow.
+1. Default mode runs a collapsed single chain (`asm.bp.p_ctg` as `asm.primary.fa`); `--n-hap K` and `-s` are collapse tuning, a single purge_dups pass is allowed. This is the mode used for the allopolyploid assembly.
+2. `phased_assembly: True` (Hi-C phased hap1/hap2 dual chain) kept as upstream.
+3. New AutoHiC post-scaffolding correction (`include_autohic`): matlock → 3D-DNA visualizer → AutoHiC neural-network correction; manual Juicebox review stays outside the workflow.
 
 For environment requirements and per-step parameters, see the upstream README below.
 
